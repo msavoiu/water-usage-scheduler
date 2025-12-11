@@ -12,7 +12,7 @@ class Appliance {
         );
 
         // Setters
-        void setName(std::string name);
+        void setName(const std::string& name);
         void setCycleTime(double minutes);
         void setWaterUsagePerMinute(const std::vector<double>& liters);
         void setInterruptable(bool interruptable);
@@ -21,16 +21,16 @@ class Appliance {
         // Getters
         std::string name() const;
         double cycleTime() const;
-        double waterUsagePerMinute() const;
+        const std::vector<double>& waterUsagePerMinute() const;
         bool interruptable() const;
         bool takesGreywater() const;
 
     protected:
-        std::string name;
-        double cycle_time; // minutes
-        std::vector<double> water_usage_per_minute; // appliances usually have bursts of water usage
-        bool interruptable; // some appliances, like washing machine, should not be stopped and left to sit for extended periods of time
-        bool takes_greywater;
+        std::string name_;
+        double cycle_time_; // minutes
+        std::vector<double> water_usage_per_minute_; // appliances usually have bursts of water usage
+        bool interruptable_; // some appliances, like washing machine, should not be stopped and left to sit for extended periods of time
+        bool takes_greywater_;
 };
 
 // Generates greywater for use by other appliances/systems
