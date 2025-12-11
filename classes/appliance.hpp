@@ -51,5 +51,5 @@ class GreywaterAppliance: public Appliance {
         double waterOutputPerCycle() const;  
 
     private:
-        double water_output_per_cycle; // liters
+        double water_output_per_cycle_; // liters
 };
