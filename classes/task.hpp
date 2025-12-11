@@ -15,7 +15,7 @@ class Task {
         Task(
             const Appliance& appliance,
             TaskState state,
-            int priority,
+            int priority
         );
 
     private:
