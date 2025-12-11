@@ -1,19 +1,23 @@
 class WaterSystem {
     public:
-        WaterSystem();
+        WaterSystem(
+            double water_supply_per_hour,
+            double greywater_storage_capacity,
+            double current_greywater_store
+        );
 
         // Setters
-        void setSupplyPerHour();
-        void setGreywaterStorageCapacity();
-        void setCurrentGreywaterStore();
+        void setWaterSupplyPerHour(double water_supply_per_hour);
+        void setGreywaterStorageCapacity(double greywater_storage_capacity);
+        void setCurrentGreywaterStore(double current_greywater_store);
 
         // Getters
-        double supplyPerHour();
-        double greywaterStorageCapacity();
-        double currentGreywaterStore();
+        double waterSupplyPerHour() const;
+        double greywaterStorageCapacity() const;
+        double currentGreywaterStore() const;
 
     private:
-        double supply_per_hour;
-        double greywater_storage_capacity;
-        double current_greywater_store;
+        double water_supply_per_hour_;
+        double greywater_storage_capacity_;
+        double current_greywater_store_;
 };
