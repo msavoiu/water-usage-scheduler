@@ -18,14 +18,17 @@ class Task {
             int priority
         );
 
+        // Getters
+        const Appliance& appliance() const;
+
     private:
-        Appliance appliance;
+        const Appliance& appliance_;
 
-        TaskState state;
-        int priority;
-        double time_remaining;
-        bool can_preempt;
+        TaskState state_;
+        int priority_;
+        double time_remaining_;
+        bool can_preempt_;
 
-        int id;
-        static std::atomic<int> next_id;
+        int id_;
+        static std::atomic<int> next_id_;
 };
