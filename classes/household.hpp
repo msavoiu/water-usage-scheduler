@@ -6,7 +6,8 @@
 class Household {
     public:
         Household(const std::string& config_file);
+        std::vector<std::unique_ptr<Appliance>> getAppliances() const;
 
     private:
-        std::vector<std::unique_ptr<Task>> tasks;
+        std::vector<std::unique_ptr<Appliance>> appliances_;
 };
