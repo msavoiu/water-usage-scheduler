@@ -14,6 +14,22 @@
     "cycle_time": 45,
     "water_usage_per_minute": [1.5, 2.0, 0.8],
     "interruptable": false,
+    "takes_greywater": false
+  },
+  {
+    "type": "Standard",
+    "name": "Backyard Irrigation",
+    "cycle_time": 30,
+    "water_usage_per_minute": [1.5, 2.0, 0.8],
+    "interruptable": true,
+    "takes_greywater": true
+  },
+  {
+    "type": "Greywater",
+    "name": "Toilet",
+    "cycle_time": 30,
+    "water_usage_per_minute": [1.5, 2.0, 0.8],
+    "interruptable": true,
     "takes_greywater": true
   }
 ]
