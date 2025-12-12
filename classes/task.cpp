@@ -14,5 +14,9 @@ Task::Task(
 {}
 
 const Appliance& Task::appliance() const { return appliance_; }
+TaskState Task::state() const { return state_; }
+double Task::timeRemaining() const { return priority_; }
+bool Task::canPreempt() const { return can_preempt_; }
+int Task::id() const { return id_; }
 
 std::atomic<int> Task::next_id_{0};

@@ -20,6 +20,10 @@ class Task {
 
         // Getters
         const Appliance& appliance() const;
+        TaskState state() const;
+        double timeRemaining() const;
+        bool canPreempt() const;
+        int id() const;
 
     private:
         const Appliance& appliance_;
