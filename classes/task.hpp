@@ -22,7 +22,7 @@ class Task {
         const Appliance& appliance() const;
         TaskState state() const;
         int priority() const;
-        double timeRemaining() const;
+        int timeRemaining() const;
         bool canPreempt() const;
         int id() const;
 
@@ -31,7 +31,8 @@ class Task {
 
         TaskState state_;
         int priority_;
-        double time_remaining_;
+        int arrival_time // minutes since midnight
+        int time_remaining_;
         bool can_preempt_;
 
         int id_;

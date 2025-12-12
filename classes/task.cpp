@@ -16,7 +16,7 @@ Task::Task(
 const Appliance& Task::appliance() const { return appliance_; }
 TaskState Task::state() const { return state_; }
 int Task::priority() const { return priority_; }
-double Task::timeRemaining() const { return priority_; }
+int Task::timeRemaining() const { return priority_; }
 bool Task::canPreempt() const { return can_preempt_; }
 int Task::id() const { return id_; }
 
