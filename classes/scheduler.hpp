@@ -29,8 +29,6 @@ class Scheduler {
         std::vector<std::unique_ptr<Task>> predefined_tasks_;
         WaterSystem& water_system_;
 
-        bool running_;
-
         std::priority_queue<
             std::unique_ptr<Task>,
             std::vector<std::unique_ptr<Task>>,

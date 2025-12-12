@@ -21,7 +21,7 @@ void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
 void Scheduler::arrivalThread() {
     size_t next_task_index = 0;
 
-    while (running_) { // each iteration represents a minute of simulation time
+    while (clockRunning()) { // each iteration represents a minute of simulation time
         double current_time_ = simulation_clock_;
 
         { // start critical section
@@ -47,16 +47,16 @@ void Scheduler::arrivalThread() {
 }
 
 void Scheduler::schedulerThread() {
-    while (running_) {
+    while (clockRunning()) {
         std::unique_ptr<Task> next_task;
 
         { // start critical section
             std::unique_lock<std::mutex> lock(queue_mutex_);
 
             // wait until there is a task or shutdown
-            queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !running_; });
+            queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
 
-            if (!running_) {
+            if (!clockRunning()) {
                 break;
             }
 

@@ -1,3 +1,6 @@
+#include <chrono>
+#include <thread>
+
 #include "classes/appliance.hpp"
 #include "classes/task.hpp"
 #include "classes/water_system.hpp"
@@ -15,6 +18,11 @@ int main() {
         scheduler.schedulerThread();
 
         scheduler.advanceClock();
+
+        // sleep for 1 second between each simulated minute of wall-clock time
+        std::this_thread::sleep_for(
+            std::chrono::duration<double>(1.0)
+        );
     }
 
     return 0;
