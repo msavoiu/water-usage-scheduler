@@ -14,6 +14,10 @@ Scheduler::Scheduler(
       time_step_(1.0) // 1 minute (1 second in simulation time)
 {}
 
+bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
+
+void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
+
 void Scheduler::arrivalThread() {
     size_t next_task_index = 0;
 

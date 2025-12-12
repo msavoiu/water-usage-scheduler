@@ -18,6 +18,10 @@ class Scheduler {
     public:
         Scheduler(std::vector<std::unique_ptr<Task>> predefined_tasks, WaterSystem& water_system);
 
+        // Handling simulation time
+        bool clockRunning() const;
+        void advanceClock();
+
         void arrivalThread();
         void schedulerThread();
 
