@@ -18,6 +18,8 @@ class Task {
             int priority
         );
 
+        void runFor(int seconds);
+
         // Getters
         const Appliance& appliance() const;
         TaskState state() const;

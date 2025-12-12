@@ -48,7 +48,7 @@ void Scheduler::arrivalThread() {
 
 void Scheduler::schedulerThread() {
     while (clockRunning()) {
-        std::unique_ptr<Task> next_task;
+        std::unique_ptr<Task> curr_task;
 
         { // start critical section
             std::unique_lock<std::mutex> lock(queue_mutex_);
@@ -61,11 +61,27 @@ void Scheduler::schedulerThread() {
             }
 
             // pop ready task from queue
-            next_task = std::move(const_cast<std::unique_ptr<Task>&>(task_queue_.top()));
+            curr_task = std::move(const_cast<std::unique_ptr<Task>&>(task_queue_.top()));
             task_queue_.pop();
 
         } // end critical section
 
-        next_task->runFor(next_task->timeRemaining());
+        // run task
+        while (curr_task->timeRemaining() > 0 && clockRunning()) {
+            curr_task->runFor(1); // run task a second at a time
+            simulation_clock_ -= 1.0;
+
+            if (curr_task->canPreempt()) {
+                { // start critical section
+                    std::lock_guard<std::mutex> lock(queue_mutex_);
+
+                    if (!task_queue_.empty() && task_queue_.top()->priority() > curr_task->priority()) {
+                        // preempt current task, add it back to the queue
+                        task_queue_.push(std::move(curr_task));
+                        break;
+                    }
+                }
+            }
+        }
     }
 }

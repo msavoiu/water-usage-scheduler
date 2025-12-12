@@ -13,6 +13,10 @@ Task::Task(
       id_(next_id_.fetch_add(1))
 {}
 
+void Task::runFor(int seconds) {
+    time_remaining_ -= seconds;
+}
+
 const Appliance& Task::appliance() const { return appliance_; }
 TaskState Task::state() const { return state_; }
 int Task::priority() const { return priority_; }
