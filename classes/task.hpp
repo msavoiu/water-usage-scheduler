@@ -21,6 +21,7 @@ class Task {
         // Getters
         const Appliance& appliance() const;
         TaskState state() const;
+        int priority() const;
         double timeRemaining() const;
         bool canPreempt() const;
         int id() const;
