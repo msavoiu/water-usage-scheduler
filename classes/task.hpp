@@ -29,6 +29,16 @@ class Task {
         bool canPreempt() const;
         int id() const;
 
+        // Setters
+        void setAppliance(const Appliance& appliance);
+        void setState(TaskState state);
+        void setPriority(int priority);
+        void setTimeRemaining(int time_remaining);
+        void setArrivalTime(int arrival_time);
+        void setCanPreempt(bool can_preempt);
+        void setId(int id);
+
+
     private:
         const Appliance& appliance_;
 
