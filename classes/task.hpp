@@ -42,6 +42,7 @@ class Task {
         void setPreemptions(bool preemptions);
         void setId(int id);
 
+        bool operator<(const Task& other) const; 
 
     private:
         const Appliance& appliance_;

@@ -38,3 +38,8 @@ void Task::setPreemptions(bool preemptions) { preemptions_ = preemptions; }
 void Task::setId(int id) { id_ = id; }
 
 std::atomic<int> Task::next_id_{0};
+
+// operator overload for priority queue
+bool Task::operator<(const Task& other) const {
+    return (priority_ < other.priority());
+}
