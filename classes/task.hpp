@@ -15,7 +15,7 @@ class Task {
         Task(
             const Appliance& appliance,
             TaskState state,
-            int priority
+            int base_priority
         );
 
         void runFor(int seconds);
@@ -23,19 +23,23 @@ class Task {
         // Getters
         const Appliance& appliance() const;
         TaskState state() const;
+        int basePriority() const;
         int priority() const;
-        int timeRemaining() const;
-        int arrivalTime() const;
+        double timeRemaining() const;
+        double arrivalTime() const;
         bool canPreempt() const;
+        int preemptions() const;
         int id() const;
 
         // Setters
         void setAppliance(const Appliance& appliance);
         void setState(TaskState state);
+        void setBasePriority(int base_priority);
         void setPriority(int priority);
-        void setTimeRemaining(int time_remaining);
-        void setArrivalTime(int arrival_time);
+        void setTimeRemaining(double time_remaining);
+        void setArrivalTime(double arrival_time);
         void setCanPreempt(bool can_preempt);
+        void setPreemptions(bool preemptions);
         void setId(int id);
 
 
@@ -43,10 +47,12 @@ class Task {
         const Appliance& appliance_;
 
         TaskState state_;
+        int base_priority_;
         int priority_;
-        int arrival_time_; // minutes since midnight
-        int time_remaining_;
+        double arrival_time_; // minutes since midnight
+        double time_remaining_;
         bool can_preempt_;
+        int preemptions_;
 
         int id_;
         static std::atomic<int> next_id_;

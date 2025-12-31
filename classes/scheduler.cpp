@@ -12,7 +12,7 @@ Scheduler::Scheduler(
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(1440.0),
       time_step_(1.0) // 1 minute (1 second in simulation time)
-{}
+{} 
 
 bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
 
@@ -71,7 +71,7 @@ void Scheduler::schedulerThread() {
             curr_task->runFor(1); // run task a second at a time
             simulation_clock_ -= 1.0;
 
-            if (curr_task->canPreempt()) {
+            if (curr_task->canPreempt() && ) {
                 { // start critical section
                     std::lock_guard<std::mutex> lock(queue_mutex_);
 
@@ -84,4 +84,27 @@ void Scheduler::schedulerThread() {
             }
         }
     }
+}
+
+void Scheduler::updatePriority(std::unique_ptr<Task> task) {
+    int priority = task->priority();
+
+    // INCREASE
+    priority += task->preemptions();
+    if (task->appliance().producesGreywater()) {
+        // increase priority
+    }
+
+    // DECREASE
+    priority -= task->timeRemaining();
+
+    // GREYWATER CONSIDERATIONS
+    if (task->appliance().takesGreywater() &&
+        water_system_.currentGreywaterStore() < task->appliance().totalWaterUsage()) {
+        // decrease priority
+    } else if (task->appliance().takesGreywater()) {
+        // increase priority (since greywater is available to use right now)
+    }
+
+    task->setPriority(priority);
 }

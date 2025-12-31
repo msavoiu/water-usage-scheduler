@@ -6,7 +6,7 @@
 #include "task.hpp"
 #include "water_system.hpp"
 
-// For priority queue's use
+// For priority queue
 struct TaskComparator {
     bool operator()(const std::unique_ptr<Task>& a,
                     const std::unique_ptr<Task>& b) const {
@@ -24,6 +24,8 @@ class Scheduler {
 
         void arrivalThread();
         void schedulerThread();
+
+        void updatePriority(std::unique_ptr<Task> task);
 
     private:
         std::vector<std::unique_ptr<Task>> predefined_tasks_;
