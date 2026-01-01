@@ -1,17 +1,23 @@
 #include <utility>
 #include <thread>
+#include <iostream>
+#include <iomanip>
+#include <algorithm>
+#include <sstream>
 
 #include "scheduler.hpp"
+#include "string"
 
 Scheduler::Scheduler(
     std::vector<std::unique_ptr<Task>> predefined_tasks,
-    WaterSystem& water_system
+    WaterSystem& water_system,
+    double time_step
 )
     : predefined_tasks_(predefined_tasks),
       water_system_(water_system),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(1440.0),
-      time_step_(1.0) // 1 minute (1 second in simulation time)
+      time_step_(time_step)
 {} 
 
 bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }

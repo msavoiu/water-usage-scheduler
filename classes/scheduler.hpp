@@ -6,17 +6,13 @@
 #include "task.hpp"
 #include "water_system.hpp"
 
-// For priority queue
-struct TaskComparator {
-    bool operator()(const std::unique_ptr<Task>& a,
-                    const std::unique_ptr<Task>& b) const {
-        return a->priority() < b->priority();
-    }
-};
-
 class Scheduler {
     public:
-        Scheduler(std::vector<std::unique_ptr<Task>> predefined_tasks, WaterSystem& water_system);
+        Scheduler(
+            std::vector<std::unique_ptr<Task>> predefined_tasks,
+            WaterSystem& water_system,
+            double time_step
+        );
 
         // Handling simulation time
         bool clockRunning() const;
@@ -27,14 +23,17 @@ class Scheduler {
 
         void updatePriority(std::unique_ptr<Task> task);
 
+        // TERMINAL DISPLAY
+        void printState() const;
+
     private:
-        std::vector<std::unique_ptr<Task>> predefined_tasks_;
         WaterSystem& water_system_;
 
+        std::vector<std::unique_ptr<Task>> all_tasks_;
+
         std::priority_queue<
-            std::unique_ptr<Task>,
-            std::vector<std::unique_ptr<Task>>,
-            TaskComparator
+            Task*,
+            std::vector<Task*>
         > task_queue_;
 
         std::mutex queue_mutex_;

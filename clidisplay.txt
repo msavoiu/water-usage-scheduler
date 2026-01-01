@@ -1,0 +1,11 @@
+Tasks in the tasks table should be ordered firstly by status (running -> waiting -> ready -> new -> terminated),
+and then by priority (descending).
+
+TASKS:
+ID      | Appliance          | Status        | Priority    | Time Remaining
+--------+--------------------+---------------+-------------+-------------------
+238     | Dishwasher         | RUNNING       | 84          | 0h 15m
+3909    | Washing Machine    | READY         | 234         | 1h 30m
+557     | Irrigation         | TERMINATED    | 22          | 2h 00m
+                                                     
+GREYWATER: 6.7/14 liters available

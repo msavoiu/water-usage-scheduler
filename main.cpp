@@ -11,9 +11,14 @@ int main() {
     WaterSystem water_system(10.0, 5.0, 0.0);
     std::vector<std::unique_ptr<Task>> predefined_tasks;
 
-    Scheduler scheduler(predefined_tasks, water_system);
+    Scheduler scheduler(
+        predefined_tasks,
+        water_system,
+        60.0 // time_step
+    );
 
     while (scheduler.clockRunning()) {
+        // process new arrivals
         scheduler.arrivalThread();
         scheduler.schedulerThread();
 

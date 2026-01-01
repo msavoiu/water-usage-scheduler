@@ -2,11 +2,11 @@
 
 Task::Task(
     const Appliance& appliance,
-    TaskState state,
+    TaskStatus status,
     int base_priority
 )
     : appliance_(appliance),
-      state_(state),
+      status_(status),
       base_priority_(base_priority),
       time_remaining_(appliance.cycleTime()),
       can_preempt_(appliance.interruptable()),
@@ -18,7 +18,7 @@ void Task::runFor(int seconds) {
 }
 
 const Appliance& Task::appliance() const { return appliance_; }
-TaskState Task::state() const { return state_; }
+TaskStatus Task::status() const { return status_; }
 int Task::basePriority() const { return base_priority_; }
 int Task::priority() const { return priority_; }
 double Task::arrivalTime() const { return arrival_time_; }
@@ -28,7 +28,7 @@ int Task::preemptions() const { return preemptions_; }
 int Task::id() const { return id_; }
 
 void Task::setAppliance(const Appliance& appliance) { appliance_ = appliance; }
-void Task::setState(TaskState state) { state_ = state; }
+void Task::setStatus(TaskStatus status) { status_ = status; }
 void Task::setBasePriority(int base_priority) { base_priority_ = base_priority; }
 void Task::setPriority(int priority) { priority_ = priority; }
 void Task::setTimeRemaining(double time_remaining) { time_remaining_ = time_remaining; }
@@ -40,6 +40,6 @@ void Task::setId(int id) { id_ = id; }
 std::atomic<int> Task::next_id_{0};
 
 // operator overload for priority queue
-bool Task::operator<(const Task& other) const {
-    return (priority_ < other.priority());
+bool Task::operator>(const Task& other) const {
+    return (priority_ > other.priority());
 }
