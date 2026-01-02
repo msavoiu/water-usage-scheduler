@@ -1,3 +1,4 @@
+#include <iostream>
 #include <chrono>
 #include <thread>
 
@@ -22,13 +23,17 @@ int main() {
         scheduler.arrivalThread();
         scheduler.schedulerThread();
 
-        scheduler.advanceClock();
+        // update CLI display
+        scheduler.printState();
 
         // sleep for 1 second between each simulated minute of wall-clock time
+        scheduler.advanceClock();
         std::this_thread::sleep_for(
             std::chrono::duration<double>(1.0)
         );
     }
+
+    std::cout << "Scheduling complete\n";
 
     return 0;
 }

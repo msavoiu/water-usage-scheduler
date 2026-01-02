@@ -114,3 +114,76 @@ void Scheduler::updatePriority(std::unique_ptr<Task> task) {
 
     task->setPriority(priority);
 }
+
+void Scheduler::printState() {
+    std::lock_guard<std::mutex> lock(queue_mutex_);
+
+    // clear screen
+    std::cout << "\033[2J\033[H";
+
+    std::vector<const Task*> active;
+    std::vector<const Task*> inactive;
+
+    active.reserve(all_tasks_.size());
+    inactive.reserve(all_tasks_.size());
+
+    // Split tasks
+    for (const auto& t : all_tasks_) {
+        if (isActive(t->status()))
+            active.push_back(t.get());
+        else
+            inactive.push_back(t.get());
+    }
+
+    // Sort for display
+    std::sort(active.begin(), active.end(), taskPrintCompare);
+    std::sort(inactive.begin(), inactive.end(), taskPrintCompare);
+
+    auto printHeader = []() {
+        std::cout << std::left
+                  << std::setw(8)  << "ID" << "| "
+                  << std::setw(20) << "Appliance" << "| "
+                  << std::setw(13) << "Status" << "| "
+                  << std::setw(12) << "Priority" << "| "
+                  << "Time Remaining\n";
+
+        std::cout
+            << "--------+--------------------+---------------+-------------+-------------------\n";
+    };
+
+    // ---------- ACTIVE ----------
+    std::cout << "ACTIVE TASKS:\n";
+    printHeader();
+
+    for (const Task* t : active) {
+        std::cout << std::left
+                  << std::setw(8)  << t->id() << "| "
+                  << std::setw(20) << t->appliance().name() << "| "
+                  << std::setw(13) << statusToString(t->status()) << "| "
+                  << std::setw(12) << t->priority() << "| "
+                  << formatTime(t->timeRemaining())
+                  << '\n';
+    }
+
+    std::cout << "\nGREYWATER: "
+              << water_system_.currentGreywaterStore() << "/"
+              << water_system_.greywaterStorageCapacity()
+              << " liters available\n\n";
+
+    // ---------- INACTIVE ----------
+    std::cout << "INACTIVE TASKS:\n";
+    printHeader();
+
+    for (const Task* t : inactive) {
+        std::cout << std::left
+                  << std::setw(8)  << t->id() << "| "
+                  << std::setw(20) << t->appliance().name() << "| "
+                  << std::setw(13) << statusToString(t->status()) << "| "
+                  << std::setw(12) << t->priority() << "| "
+                  << formatTime(t->timeRemaining())
+                  << '\n';
+    }
+
+    std::cout << std::flush;
+}
+

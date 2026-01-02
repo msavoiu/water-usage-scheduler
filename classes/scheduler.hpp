@@ -18,13 +18,12 @@ class Scheduler {
         bool clockRunning() const;
         void advanceClock();
 
-        void arrivalThread();
-        void schedulerThread();
+        void arrivalThread(); // processing new arrivals
+        void schedulerThread(); // running tasks on the queue
 
         void updatePriority(std::unique_ptr<Task> task);
 
-        // TERMINAL DISPLAY
-        void printState() const;
+        void printState();
 
     private:
         WaterSystem& water_system_;
@@ -33,7 +32,8 @@ class Scheduler {
 
         std::priority_queue<
             Task*,
-            std::vector<Task*>
+            std::vector<Task*>,
+            TaskCompare
         > task_queue_;
 
         std::mutex queue_mutex_;

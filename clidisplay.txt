@@ -1,11 +1,16 @@
-Tasks in the tasks table should be ordered firstly by status (running -> waiting -> ready -> new -> terminated),
-and then by priority (descending).
+Tasks in the tasks table should be ordered firstly by status (running -> waiting -> ready -> new -> terminated), and then by priority (descending). The function to print this state is called every time tick (a set variable that represents number of milliseconds) to keep the tables dynamically updating.
 
-TASKS:
+ACTIVE TASKS:
 ID      | Appliance          | Status        | Priority    | Time Remaining
 --------+--------------------+---------------+-------------+-------------------
 238     | Dishwasher         | RUNNING       | 84          | 0h 15m
-3909    | Washing Machine    | READY         | 234         | 1h 30m
-557     | Irrigation         | TERMINATED    | 22          | 2h 00m
-                                                     
+3909    | Washing Machine    | READY         | 234         | 0h 30m
+                                            
 GREYWATER: 6.7/14 liters available
+
+INACTIVE TASKS:
+ID      | Appliance          | Status        | Priority    | Time Remaining
+--------+--------------------+---------------+-------------+-------------------
+324     | Dishwasher         | WAITING       | 48          | 2h 00m
+9874    | Washing Machine    | WAITING       | 992         | 0h 30m
+343     | Irrigation         | TERMINATED    | 14          | 2h 00m
