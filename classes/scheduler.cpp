@@ -13,7 +13,7 @@ Scheduler::Scheduler(
     WaterSystem& water_system,
     double time_step
 )
-    : predefined_tasks_(predefined_tasks),
+    : all_tasks_(predefined_tasks),
       water_system_(water_system),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(1440.0),
@@ -34,12 +34,12 @@ void Scheduler::arrivalThread() {
             std::lock_guard<std::mutex> lock(queue_mutex_);
 
             // check predetermined tasks (simulation)
-            for (size_t i = next_task_index; i < predefined_tasks_.size(); ++i) {
-                auto& task = predefined_tasks_[i];
+            for (size_t i = next_task_index; i < all_tasks_.size(); ++i) {
+                auto& task = all_tasks_[i];
 
                 // move task into queue if its time has come
                 if (task->arrivalTime() == current_time_) {
-                    task_queue_.push(std::move(task));
+                    task_queue_.push(task.get()); // need to push raw pointer to the object managed by the smart pointers
                 } else {
                     next_task_index = i;
                     break;
@@ -54,7 +54,7 @@ void Scheduler::arrivalThread() {
 
 void Scheduler::schedulerThread() {
     while (clockRunning()) {
-        std::unique_ptr<Task> curr_task;
+        Task* curr_task;
 
         { // start critical section
             std::unique_lock<std::mutex> lock(queue_mutex_);
@@ -67,7 +67,7 @@ void Scheduler::schedulerThread() {
             }
 
             // pop ready task from queue
-            curr_task = std::move(const_cast<std::unique_ptr<Task>&>(task_queue_.top()));
+            curr_task = task_queue_.top();
             task_queue_.pop();
 
         } // end critical section
@@ -77,7 +77,7 @@ void Scheduler::schedulerThread() {
             curr_task->runFor(1); // run task a second at a time
             simulation_clock_ -= 1.0;
 
-            if (curr_task->canPreempt() && ) {
+            if (curr_task->canPreempt() && task_queue_.top()->priority() < curr_task->priority()) { // there's a better priotity task ready
                 { // start critical section
                     std::lock_guard<std::mutex> lock(queue_mutex_);
 
@@ -109,7 +109,7 @@ void Scheduler::updatePriority(std::unique_ptr<Task> task) {
         water_system_.currentGreywaterStore() < task->appliance().totalWaterUsage()) {
         // decrease priority
     } else if (task->appliance().takesGreywater()) {
-        // increase priority (since greywater is available to use right now)
+        // increase priority (since greywater is available to use right now
     }
 
     task->setPriority(priority);
