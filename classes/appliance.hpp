@@ -17,7 +17,7 @@ class Appliance {
         // Setters
         void setName(const std::string& name);
         void setCycleTime(int minutes);
-        void setWaterUsagePerMinute(const std::vector<int>& liters);
+        void setWaterUsagePerMinute(const std::vector<double>& liters);
         void setTotalWaterUsage(double total_water_usage);
         void setInterruptable(bool interruptable);
         void setTakesGreywater(bool takes_greywater);

@@ -2,6 +2,14 @@
 
 #include "appliance.hpp"
 
+enum TaskStatus {
+    NEW,
+    RUNNING,
+    WAITING,
+    READY,
+    TERMINATED
+};
+
 class Task {
     public:
         Task(
@@ -51,14 +59,7 @@ class Task {
         static std::atomic<int> next_id_;
 };
 
-// STATUS AND HELPERS
-enum TaskStatus {
-    NEW,
-    RUNNING,
-    WAITING,
-    READY,
-    TERMINATED
-};
+// HELPERS
 
 int statusRank(TaskStatus s) {
     switch (s) {

@@ -14,7 +14,9 @@ Appliance::Appliance(
       total_water_usage_(total_water_usage),
       interruptable_(interruptable),
       takes_greywater_(takes_greywater)
-{}
+{
+    produces_greywater_ = false;
+}
 
 Appliance::Appliance(
     const Appliance& other
@@ -30,7 +32,7 @@ Appliance::Appliance(
 // Setters
 void Appliance::setName(const std::string& name) { name_ = name; }
 void Appliance::setCycleTime(int minutes) { cycle_time_ = minutes; }
-void Appliance::setWaterUsagePerMinute(const std::vector<int>& liters) { water_usage_per_minute_ = liters; }
+void Appliance::setWaterUsagePerMinute(const std::vector<double>& liters) { water_usage_per_minute_ = liters; }
 void Appliance::setTotalWaterUsage(double total_water_usage) { total_water_usage_ = total_water_usage; }
 void Appliance::setInterruptable(bool interruptable) { interruptable_ = interruptable; }
 void Appliance::setTakesGreywater(bool takes_greywater) { takes_greywater_ = takes_greywater; }
@@ -63,7 +65,9 @@ GreywaterAppliance::GreywaterAppliance(
         false
     ),
     water_output_per_cycle_(water_output_per_cycle)
-{}
+{
+    produces_greywater_ = true;
+}
 
 // Setters
 void GreywaterAppliance::setWaterOutputPerCycle(double water_output_per_cycle) { water_output_per_cycle_ = water_output_per_cycle; }
