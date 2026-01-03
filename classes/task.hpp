@@ -1,4 +1,5 @@
 #include <atomic>
+#include <sstream>
 
 #include "appliance.hpp"
 

@@ -42,7 +42,7 @@ class Appliance {
         bool produces_greywater_;
 };
 
-// Generates greywater for use by other appliances/systems
+// generates greywater for use by other appliances/systems
 class GreywaterAppliance: public Appliance {
     public:
         GreywaterAppliance(

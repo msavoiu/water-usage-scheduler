@@ -15,25 +15,30 @@ Household::Household(const std::string& config_file) {
 
     for (const auto& item : data) {
         if (item["type"] == "Greywater") {
-            appliances.emplace_back(
-                item["name"],
-                item["cycle_time"],
-                item["water_usage_per_minute"].get<std::vector<double>>(),
-                item["interruptable"],
-                item["takes_greywater"],
-                item["water_output_per_cycle"]
+            appliances_.emplace_back(
+                std::make_unique<Appliance>(
+                    item["name"],
+                    item["cycle_time"],
+                    item["water_usage_per_minute"].get<std::vector<double>>(),
+                    item["total_water_usage"],
+                    item["interruptable"],
+                    item["water_output_per_cycle"]
+                )
             );
 
         } else {
             appliances_.emplace_back(
-                item["name"],
-                item["cycle_time"],
-                item["water_usage_per_minute"].get<std::vector<double>>(),
-                item["interruptable"],
-                item["takes_greywater"]
+                std::make_unique<Appliance>(
+                    item["name"],
+                    item["cycle_time"],
+                    item["water_usage_per_minute"].get<std::vector<double>>(),
+                    item["total_water_usage"],
+                    item["interruptable"],
+                    item["takes_greywater"]
+                )
             );
         }
     }
 }
 
-std::vector<std::unique_ptr<Appliance>> Household::getAppliances() const { return appliances_; }
+const std::vector<std::unique_ptr<Appliance>>& Household::getAppliances() const { return appliances_; }
