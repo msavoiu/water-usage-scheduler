@@ -18,10 +18,12 @@ class Scheduler {
         bool clockRunning() const;
         void advanceClock();
 
-        void arrivalThread(); // processing new arrivals
-        void schedulerThread(); // running tasks on the queue
+        void schedulerThread(); // asimulates arrival of new tasks from appliances, adding new arrivals to the queue
+        void taskRunnerThread(); // facilitate running/preempting of tasks
 
-        void updatePriority(std::unique_ptr<Task> task);
+        bool tryPreempt();
+        void runCurrentTask();
+        void updatePriority(Task* task);
 
         void printState();
 
@@ -36,8 +38,12 @@ class Scheduler {
             TaskCompare
         > task_queue_;
 
+        bool running_task_;
+        Task* current_task_;
+
         std::mutex queue_mutex_;
         std::condition_variable queue_cv_;
+        std::condition_variable run_task_cv_;
 
         // parsed from a JSON file for simulating arrival of random tasks throughout a day in a household
         std::vector<Task*> random_tasks_;

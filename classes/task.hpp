@@ -19,6 +19,7 @@ class Task {
             int base_priority
         );
 
+        bool finished(); 
         void runFor(int seconds);
 
         // Getters

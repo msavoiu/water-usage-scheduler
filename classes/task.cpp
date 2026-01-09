@@ -13,8 +13,17 @@ Task::Task(
       id_(next_id_.fetch_add(1))
 {}
 
+bool Task::finished() {
+    return (status_ == TERMINATED);
+}
+
 void Task::runFor(int seconds) {
-    time_remaining_ -= seconds;
+    if (time_remaining_ > 0.0) {
+        time_remaining_ -= seconds;
+    }
+    if (time_remaining_ == 0.0) {
+        status_ = TERMINATED;
+    }
 }
 
 const Appliance& Task::appliance() const { return appliance_; }

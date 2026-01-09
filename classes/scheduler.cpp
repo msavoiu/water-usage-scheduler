@@ -15,6 +15,7 @@ Scheduler::Scheduler(
 )
     : all_tasks_(predefined_tasks),
       water_system_(water_system),
+      running_task_(false),
       next_random_task_index_(0),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(1440.0),
@@ -25,7 +26,7 @@ bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
 
 void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
 
-void Scheduler::arrivalThread() {
+void Scheduler::schedulerThread() {
 
     while (clockRunning()) { // each iteration represents a minute of simulation time
         { // start critical section
@@ -50,29 +51,58 @@ void Scheduler::arrivalThread() {
     }
 }
 
-void Scheduler::schedulerThread() {
-    while (clockRunning()) {
-        Task* curr_task;
+void Scheduler::taskRunnerThread() {
 
+    while (clockRunning()) {
         { // start critical section
             std::unique_lock<std::mutex> lock(queue_mutex_);
 
-            // wait until there is a task or shutdown
+            // wait until there is at least one task in the queue or shutdown
             queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
 
-            if (!clockRunning()) {
-                break;
+            if (running_task_) { // check for preemption or keep running as normal
+                if (!tryPreempt()) {
+                    runCurrentTask();
+                }
+            } else { // select new task for running
+                current_task_ = task_queue_.top();
+                task_queue_.pop();
+
+                running_task_ = true;
+                runCurrentTask();
             }
-
-            // pop ready task from queue
-            curr_task = task_queue_.top();
-            task_queue_.pop();
-
         } // end critical section
     }
 }
 
-void Scheduler::updatePriority(std::unique_ptr<Task> task) {
+void Scheduler::runCurrentTask() {
+    current_task_->runFor(time_step_);
+
+    if (current_task_->finished()) {
+        running_task_ = false; // allows for retrieval of a new current task
+    }
+}
+
+bool Scheduler::tryPreempt() {
+    if (!task_queue_.empty()) { // if there's a higher priotity task ready in the queue
+
+        if (current_task_->canPreempt() &&
+            task_queue_.top()->priority() > current_task_->priority() &&
+            task_queue_.top()->status() == READY)
+        {
+            updatePriority(current_task_);
+            task_queue_.push(current_task_);
+
+            current_task_ = task_queue_.top();
+            task_queue_.pop();
+
+            return true;
+        }
+    }
+    return false;
+}
+
+void Scheduler::updatePriority(Task* task) {
     int priority = task->priority();
 
     // INCREASE

@@ -20,8 +20,8 @@ int main() {
 
     while (scheduler.clockRunning()) {
         // process new arrivals
-        scheduler.arrivalThread();
         scheduler.schedulerThread();
+        scheduler.taskRunnerThread();
 
         // update CLI display
         scheduler.printState();
