@@ -26,21 +26,18 @@ bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
 void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
 
 void Scheduler::arrivalThread() {
-    // size_t next_task_index = 0;
 
     while (clockRunning()) { // each iteration represents a minute of simulation time
-        double current_time_ = simulation_clock_;
-
         { // start critical section
             std::lock_guard<std::mutex> lock(queue_mutex_);
 
             // check predetermined tasks (simulation)
-            for (size_t i = next_random_task_index_; i < all_tasks_.size(); ++i) {
-                auto& task = all_tasks_[i];
+            for (size_t i = next_random_task_index_; i < random_tasks_.size(); ++i) {
+                Task* task = random_tasks_[next_random_task_index_];
 
                 // move task into queue if its time has come
-                if (task->arrivalTime() == current_time_) {
-                    task_queue_.push(task.get()); // need to push raw pointer to the object managed by the smart pointers
+                if (task->arrivalTime() == simulation_clock_) {
+                    task_queue_.push(task);
                 } else {
                     next_random_task_index_ = i;
                     break;
@@ -49,50 +46,30 @@ void Scheduler::arrivalThread() {
             
         } // end critical section
 
-        queue_cv_.notify_one(); // wake up scheduler when new task(s) have arrived
+        queue_cv_.notify_one(); // wake up scheduler if new task(s) have arrived
     }
 }
 
 void Scheduler::schedulerThread() {
-    // while (clockRunning()) {
-    //     Task* curr_task;
+    while (clockRunning()) {
+        Task* curr_task;
 
-    //     { // start critical section
-    //         std::unique_lock<std::mutex> lock(queue_mutex_);
+        { // start critical section
+            std::unique_lock<std::mutex> lock(queue_mutex_);
 
-    //         // wait until there is a task or shutdown
-    //         queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
+            // wait until there is a task or shutdown
+            queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
 
-    //         if (!clockRunning()) {
-    //             break;
-    //         }
+            if (!clockRunning()) {
+                break;
+            }
 
-    //         // pop ready task from queue
-    //         curr_task = task_queue_.top();
-    //         task_queue_.pop();
+            // pop ready task from queue
+            curr_task = task_queue_.top();
+            task_queue_.pop();
 
-    //     } // end critical section
-
-    //     // run task
-    //     while (curr_task->timeRemaining() > 0 && clockRunning()) {
-    //         curr_task->runFor(1); // run task a second at a time
-    //         simulation_clock_ -= 1.0;
-
-    //         if (curr_task->canPreempt() && task_queue_.top()->priority() < curr_task->priority()) { // there's a better priotity task ready
-    //             { // start critical section
-    //                 std::lock_guard<std::mutex> lock(queue_mutex_);
-
-    //                 if (!task_queue_.empty() && task_queue_.top()->priority() > curr_task->priority()) {
-    //                     // preempt current task, add it back to the queue
-    //                     task_queue_.push(std::move(curr_task));
-    //                     break;
-    //                 }
-    //             }
-    //         }
-    //     }
-    // }
-
-    if (!clockRunning()) return false;
+        } // end critical section
+    }
 }
 
 void Scheduler::updatePriority(std::unique_ptr<Task> task) {
