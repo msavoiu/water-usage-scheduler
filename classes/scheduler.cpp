@@ -15,6 +15,7 @@ Scheduler::Scheduler(
 )
     : all_tasks_(predefined_tasks),
       water_system_(water_system),
+      next_random_task_index_(0),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(1440.0),
       time_step_(time_step)
@@ -25,31 +26,40 @@ bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
 void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
 
 void Scheduler::arrivalThread() {
-    size_t next_task_index = 0;
+    // size_t next_task_index = 0;
 
-    while (clockRunning()) { // each iteration represents a minute of simulation time
-        double current_time_ = simulation_clock_;
+    // while (clockRunning()) { // each iteration represents a minute of simulation time
+    //     double current_time_ = simulation_clock_;
 
-        { // start critical section
-            std::lock_guard<std::mutex> lock(queue_mutex_);
+    //     { // start critical section
+    //         std::lock_guard<std::mutex> lock(queue_mutex_);
 
-            // check predetermined tasks (simulation)
-            for (size_t i = next_task_index; i < all_tasks_.size(); ++i) {
-                auto& task = all_tasks_[i];
+    //         // check predetermined tasks (simulation)
+    //         for (size_t i = next_task_index; i < all_tasks_.size(); ++i) {
+    //             auto& task = all_tasks_[i];
 
-                // move task into queue if its time has come
-                if (task->arrivalTime() == current_time_) {
-                    task_queue_.push(task.get()); // need to push raw pointer to the object managed by the smart pointers
-                } else {
-                    next_task_index = i;
-                    break;
-                }
-            }
+    //             // move task into queue if its time has come
+    //             if (task->arrivalTime() == current_time_) {
+    //                 task_queue_.push(task.get()); // need to push raw pointer to the object managed by the smart pointers
+    //             } else {
+    //                 next_task_index = i;
+    //                 break;
+    //             }
+    //         }
             
-        } // end critical section
+    //     } // end critical section
 
-        queue_cv_.notify_one(); // wake up scheduler when new task(s) have arrived
+    // only add on tasks arriving at this particular tick in time
+    while (random_tasks_[next_random_task_index_]->arrivalTime() == simulation_clock_) {
+        { // critical section
+            std::lock_guard<std::mutex> lock(queue_mutex_);
+            task_queue_.push(random_tasks_[next_random_task_index_]);
+            ++next_random_task_index_;
+        }
     }
+
+    queue_cv_.notify_one(); // wake up scheduler when new task(s) have arrived
+
 }
 
 void Scheduler::schedulerThread() {

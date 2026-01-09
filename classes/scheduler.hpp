@@ -39,6 +39,10 @@ class Scheduler {
         std::mutex queue_mutex_;
         std::condition_variable queue_cv_;
 
+        // parsed from a JSON file for simulating arrival of random tasks throughout a day in a household
+        std::vector<Task*> random_tasks_;
+        size_t next_random_task_index_;
+
         double simulation_clock_;
         double end_time_;
         double time_step_;
