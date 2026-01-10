@@ -20,8 +20,7 @@ bool Task::finished() {
 void Task::runFor(int seconds) {
     if (time_remaining_ > 0.0) {
         time_remaining_ -= seconds;
-    }
-    if (time_remaining_ == 0.0) {
+    } else {
         status_ = TERMINATED;
     }
 }
