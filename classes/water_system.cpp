@@ -10,6 +10,8 @@ WaterSystem::WaterSystem(
       current_greywater_store_(current_greywater_store)
 {}
 
+void WaterSystem::updateCurrentGreywaterStore(double liters) { current_greywater_store_ += liters; }
+
 // Setters
 void WaterSystem::setWaterSupplyPerHour(double water_supply_per_hour) { water_supply_per_hour_ = water_supply_per_hour; }
 void WaterSystem::setGreywaterStorageCapacity(double greywater_storage_capacity) { greywater_storage_capacity_ = greywater_storage_capacity; }

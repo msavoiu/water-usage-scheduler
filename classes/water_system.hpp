@@ -6,6 +6,8 @@ class WaterSystem {
             double current_greywater_store
         );
 
+        void updateCurrentGreywaterStore(double liters);
+
         // Setters
         void setWaterSupplyPerHour(double water_supply_per_hour);
         void setGreywaterStorageCapacity(double greywater_storage_capacity);
