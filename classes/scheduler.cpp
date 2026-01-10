@@ -47,7 +47,7 @@ void Scheduler::schedulerThread() {
             
         } // end critical section
 
-        queue_cv_.notify_one(); // wake up scheduler if new task(s) have arrived
+        scheduler_cv_.notify_one(); // wake up scheduler if new task(s) have arrived
     }
 }
 
@@ -58,7 +58,7 @@ void Scheduler::taskRunnerThread() {
             std::unique_lock<std::mutex> lock(queue_mutex_);
 
             // wait until there is at least one task in the queue or shutdown
-            queue_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
+            scheduler_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
 
             if (running_task_) { // check for preemption or keep running as normal
                 if (!tryPreempt()) {
