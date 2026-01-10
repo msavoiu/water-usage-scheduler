@@ -18,20 +18,24 @@ int main() {
         60.0 // time_step
     );
 
-    while (scheduler.clockRunning()) {
-        // process new arrivals
-        scheduler.schedulerThread();
-        scheduler.taskRunnerThread();
+    scheduler.start(); // starts threads
+    scheduler.wait(); // joins threads
 
-        // update CLI display
-        scheduler.printState();
+    std::cout << "Scheduling complete\n";
 
-        // sleep for 1 second between each simulated minute of wall-clock time
-        scheduler.advanceClock();
-        std::this_thread::sleep_for(
-            std::chrono::duration<double>(1.0)
-        );
-    }
+    // while (scheduler.clockRunning()) {
+    //     scheduler.schedulerThread();
+    //     scheduler.taskRunnerThread();
+
+    //     // update CLI display
+    //     scheduler.printState();
+
+    //     // sleep for 1 second between each simulated minute of wall-clock time
+    //     scheduler.advanceClock();
+    //     std::this_thread::sleep_for(
+    //         std::chrono::duration<double>(1.0)
+    //     );
+    // }
 
     std::cout << "Scheduling complete\n";
 

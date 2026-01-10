@@ -16,11 +16,32 @@ Scheduler::Scheduler(
     : all_tasks_(predefined_tasks),
       water_system_(water_system),
       running_task_(false),
+      current_task_(nullptr),
       next_random_task_index_(0),
       simulation_clock_(0.0), // clock starts at midnight
-      end_time_(1440.0),
+      end_time_(60.0 * 24.0),
       time_step_(time_step)
-{} 
+{
+    scheduler_thread_ = std::thread(&Scheduler::schedulerThread, this); // this refers to the object the function runs on
+    runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);
+}
+
+Scheduler::~Scheduler() {
+    if (scheduler_thread_.joinable())
+        scheduler_thread_.join();
+
+    if (runner_thread_.joinable())
+        runner_thread_.join();
+}
+
+void Scheduler::start() {
+    scheduler_thread_ = std::thread(&Scheduler::schedulerThread, this);
+    runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);    
+}
+
+void Scheduler::wait() {
+
+}
 
 bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
 
@@ -29,24 +50,29 @@ void Scheduler::advanceClock() { simulation_clock_ += time_step_; }
 void Scheduler::schedulerThread() {
 
     while (clockRunning()) { // each iteration represents a minute of simulation time
+        std::this_thread::sleep_for(std::chrono::seconds(1));    
+    
         { // start critical section
             std::lock_guard<std::mutex> lock(queue_mutex_);
 
+            // advance simulated time
+            simulation_clock_ += time_step_;
+
             // check predetermined tasks (simulation)
-            for (size_t i = next_random_task_index_; i < random_tasks_.size(); ++i) {
+            while (next_random_task_index_ < random_tasks_.size()) {
                 Task* task = random_tasks_[next_random_task_index_];
 
                 // move task into queue if its time has come
                 if (task->arrivalTime() == simulation_clock_) {
                     task_queue_.push(task);
+                    ++next_random_task_index_;
                 } else {
-                    next_random_task_index_ = i;
                     break;
                 }
-            }
-            
+            }  
         } // end critical section
 
+        printState();
         scheduler_cv_.notify_one(); // wake up scheduler if new task(s) have arrived
     }
 }
@@ -54,33 +80,62 @@ void Scheduler::schedulerThread() {
 void Scheduler::taskRunnerThread() {
 
     while (clockRunning()) {
+        Task* task_to_run = nullptr;
+            
         { // start critical section
             std::unique_lock<std::mutex> lock(queue_mutex_);
 
             // wait until there is at least one task in the queue or shutdown
-            scheduler_cv_.wait(lock, [&] { return !task_queue_.empty() || !clockRunning(); });
+            scheduler_cv_.wait(lock, [this] { return !task_queue_.empty() || !clockRunning(); });
+
+            if (!clockRunning()) return;
 
             if (running_task_) { // check for preemption or keep running as normal
                 if (!tryPreempt()) {
-                    runCurrentTask();
+                    task_to_run = current_task_;
                 }
             } else { // select new task for running
                 current_task_ = task_queue_.top();
                 task_queue_.pop();
 
                 running_task_ = true;
-                runCurrentTask();
+                task_to_run = current_task_;
             }
         } // end critical section
+
+        // run task outside the critical section
+        if (task_to_run) {
+            runCurrentTask();
+        }
     }
 }
 
 void Scheduler::runCurrentTask() {
     current_task_->runFor(time_step_);
 
-    if (current_task_->finished()) {
-        running_task_ = false; // allows for retrieval of a new current task
+    // deplete greywater store if the appliance can use it
+    if ( current_task_->appliance().takesGreywater() &&
+        water_system_.currentGreywaterStore() >= current_task_->appliance().totalWaterUsage())
+    {
+        water_system_.updateCurrentGreywaterStore(current_task_->appliance().waterUsagePerMinute());
     }
+
+    // replenish greywater store if appliance creates it
+    if (current_task_->appliance().producesGreywater()) {
+        water_system_.updateCurrentGreywaterStore(current_task_->appliance().waterOutputPerCycle());
+    }
+
+    // allow for retrieval of a new task when current task finished
+    {
+        std::lock_guard<std::mutex> lock(queue_mutex_);
+
+        if (current_task_->finished()) {
+            running_task_ = false; // shared resource
+            current_task_ = nullptr;
+        }
+    }
+
+    scheduler_cv_.notify_one(); // wake runner if task finished
 }
 
 bool Scheduler::tryPreempt() {
@@ -196,4 +251,3 @@ void Scheduler::printState() {
 
     std::cout << std::flush;
 }
-

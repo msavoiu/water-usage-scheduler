@@ -3,7 +3,7 @@
 Appliance::Appliance(
     const std::string& name,
     double cycle_time,
-    const std::vector<double>& water_usage_per_minute,
+    double water_usage_per_minute,
     double total_water_usage,
     bool interruptable,
     bool takes_greywater
@@ -32,7 +32,7 @@ Appliance::Appliance(
 // Setters
 void Appliance::setName(const std::string& name) { name_ = name; }
 void Appliance::setCycleTime(int minutes) { cycle_time_ = minutes; }
-void Appliance::setWaterUsagePerMinute(const std::vector<double>& liters) { water_usage_per_minute_ = liters; }
+void Appliance::setWaterUsagePerMinute(double liters) { water_usage_per_minute_ = liters; }
 void Appliance::setTotalWaterUsage(double total_water_usage) { total_water_usage_ = total_water_usage; }
 void Appliance::setInterruptable(bool interruptable) { interruptable_ = interruptable; }
 void Appliance::setTakesGreywater(bool takes_greywater) { takes_greywater_ = takes_greywater; }
@@ -41,7 +41,7 @@ void Appliance::setProducesGreywater(bool produces_greywater) { produces_greywat
 // Getters
 std::string Appliance::name() const { return name_; }
 int Appliance::cycleTime() const { return cycle_time_; }
-const std::vector<double>& Appliance::waterUsagePerMinute() const { return water_usage_per_minute_; }
+double Appliance::waterUsagePerMinute() const { return water_usage_per_minute_; }
 double Appliance::totalWaterUsage() const { return total_water_usage_; };
 bool Appliance::interruptable() const { return interruptable_; }
 bool Appliance::takesGreywater() const { return takes_greywater_; }
@@ -51,7 +51,7 @@ bool Appliance::producesGreywater() const { return produces_greywater_; }
 GreywaterAppliance::GreywaterAppliance(
     const std::string& name,
     int cycle_time,
-    const std::vector<double>& water_usage_per_minute,
+    double water_usage_per_minute,
     double total_water_usage,
     bool interruptable,
     double water_output_per_cycle

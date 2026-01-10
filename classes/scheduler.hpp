@@ -2,6 +2,7 @@
 #include <memory>
 #include <queue>
 #include <mutex>
+#include <thread>
 
 #include "task.hpp"
 #include "water_system.hpp"
@@ -14,7 +15,11 @@ class Scheduler {
             double time_step
         );
 
-        // Handling simulation time
+        ~Scheduler();
+
+        // SIMULATION
+        void start();
+        void wait();
         bool clockRunning() const;
         void advanceClock();
 
@@ -41,6 +46,9 @@ class Scheduler {
         bool running_task_;
         Task* current_task_;
 
+        // THREADING
+        std::thread scheduler_thread_;
+        std::thread runner_thread_;
         std::mutex queue_mutex_;
         std::condition_variable scheduler_cv_;
 
