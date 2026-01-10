@@ -23,14 +23,16 @@ class Scheduler {
         bool clockRunning() const;
         void advanceClock();
 
-        void schedulerThread(); // asimulates arrival of new tasks from appliances, adding new arrivals to the queue
+        void schedulerThread(); // simulates arrival of new tasks from appliances, adding new arrivals to the queue
         void taskRunnerThread(); // facilitate running/preempting of tasks
 
         bool tryPreempt();
         void runCurrentTask();
         void updatePriority(Task* task);
 
+        // DISPLAY
         void printState();
+        void printSummary();
 
     private:
         WaterSystem& water_system_;
@@ -45,6 +47,9 @@ class Scheduler {
 
         bool running_task_;
         Task* current_task_;
+
+        int finished_tasks_;
+        int unfinished_tasks_;
 
         // THREADING
         std::thread scheduler_thread_;

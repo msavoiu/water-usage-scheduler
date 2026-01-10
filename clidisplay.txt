@@ -14,3 +14,11 @@ ID      | Appliance          | Status        | Priority    | Time Remaining
 324     | Dishwasher         | WAITING       | 48          | 2h 00m
 9874    | Washing Machine    | WAITING       | 992         | 0h 30m
 343     | Irrigation         | TERMINATED    | 14          | 2h 00m
+
+SUMMARY:
+
+Finished tasks: 4
+Unfinished tasks: 0
+
+Water used: 12 liters
+Water saved: 5.3 liters (this is based on liters of greywater consumed)

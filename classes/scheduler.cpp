@@ -17,11 +17,15 @@ Scheduler::Scheduler(
       water_system_(water_system),
       running_task_(false),
       current_task_(nullptr),
+      finished_tasks_(0),
       next_random_task_index_(0),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(60.0 * 24.0),
       time_step_(time_step)
 {
+    // parse JSON and load in predetermined tasks
+    unfinished_tasks_ = all_tasks_.size();
+
     scheduler_thread_ = std::thread(&Scheduler::schedulerThread, this); // this refers to the object the function runs on
     runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);
 }
@@ -40,7 +44,16 @@ void Scheduler::start() {
 }
 
 void Scheduler::wait() {
+    // wake any threads waiting on CV so they can notice shutdown
+    scheduler_cv_.notify_all();
 
+    if (scheduler_thread_.joinable()) {
+        scheduler_thread_.join();
+    }
+
+    if (runner_thread_.joinable()) {
+        runner_thread_.join();
+    }
 }
 
 bool Scheduler::clockRunning() const { return simulation_clock_ < end_time_; }
@@ -130,7 +143,9 @@ void Scheduler::runCurrentTask() {
         std::lock_guard<std::mutex> lock(queue_mutex_);
 
         if (current_task_->finished()) {
-            running_task_ = false; // shared resource
+            ++finished_tasks_;
+            --unfinished_tasks_;
+            running_task_ = false;
             current_task_ = nullptr;
         }
     }
@@ -181,26 +196,30 @@ void Scheduler::updatePriority(Task* task) {
 }
 
 void Scheduler::printState() {
-    std::lock_guard<std::mutex> lock(queue_mutex_);
-
     // clear screen
     std::cout << "\033[2J\033[H";
 
     std::vector<const Task*> active;
     std::vector<const Task*> inactive;
+    double greywater;
 
     active.reserve(all_tasks_.size());
     inactive.reserve(all_tasks_.size());
 
-    // Split tasks
-    for (const auto& t : all_tasks_) {
-        if (isActive(t->status()))
-            active.push_back(t.get());
-        else
-            inactive.push_back(t.get());
-    }
+    { // start critical section
+        std::lock_guard<std::mutex> lock(queue_mutex_);
 
-    // Sort for display
+        // snapshot
+        for (const auto& t : all_tasks_) {
+            if (isActive(t->status()))
+                active.push_back(t.get());
+            else
+                inactive.push_back(t.get());
+        }
+        greywater = water_system_.currentGreywaterStore();
+    } // end critical section
+
+    // sort for display
     std::sort(active.begin(), active.end(), taskPrintCompare);
     std::sort(inactive.begin(), inactive.end(), taskPrintCompare);
 
@@ -231,7 +250,7 @@ void Scheduler::printState() {
     }
 
     std::cout << "\nGREYWATER: "
-              << water_system_.currentGreywaterStore() << "/"
+              << greywater << "/"
               << water_system_.greywaterStorageCapacity()
               << " liters available\n\n";
 
@@ -250,4 +269,12 @@ void Scheduler::printState() {
     }
 
     std::cout << std::flush;
+}
+
+void Scheduler::printSummary() {
+    std::cout << "SUMMARY:\n"
+              << "Finished tasks: " << finished_tasks_ << '\n'
+              << "Unfinished tasks: " << unfinished_tasks_ << "\n\n"
+              << "Water used: " << << " liters\n"
+              << "Water saved: " << << " liters\n";
 }
