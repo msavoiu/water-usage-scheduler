@@ -9,15 +9,15 @@
 #include "string"
 
 Scheduler::Scheduler(
-    std::vector<std::unique_ptr<Task>> predefined_tasks,
     WaterSystem& water_system,
     double time_step
 )
-    : all_tasks_(predefined_tasks),
-      water_system_(water_system),
+    : water_system_(water_system),
       running_task_(false),
       current_task_(nullptr),
       finished_tasks_(0),
+      water_used_(0.0),
+      greywater_used_(0.0),
       next_random_task_index_(0),
       simulation_clock_(0.0), // clock starts at midnight
       end_time_(60.0 * 24.0),
@@ -127,10 +127,13 @@ void Scheduler::runCurrentTask() {
     current_task_->runFor(time_step_);
 
     // deplete greywater store if the appliance can use it
-    if ( current_task_->appliance().takesGreywater() &&
+    if (current_task_->appliance().takesGreywater() &&
         water_system_.currentGreywaterStore() >= current_task_->appliance().totalWaterUsage())
     {
-        water_system_.updateCurrentGreywaterStore(current_task_->appliance().waterUsagePerMinute());
+        water_system_.updateCurrentGreywaterStore(-(current_task_->appliance().waterUsagePerMinute()));
+        greywater_used_ += current_task_->appliance().waterUsagePerMinute();
+    } else {
+        water_used_ += current_task_->appliance().waterUsagePerMinute();
     }
 
     // replenish greywater store if appliance creates it
@@ -275,6 +278,6 @@ void Scheduler::printSummary() {
     std::cout << "SUMMARY:\n"
               << "Finished tasks: " << finished_tasks_ << '\n'
               << "Unfinished tasks: " << unfinished_tasks_ << "\n\n"
-              << "Water used: " << << " liters\n"
-              << "Water saved: " << << " liters\n";
+              << "Water used: " << water_used_ << " liters\n"
+              << "Water saved: " << greywater_used_ << " liters\n";
 }

@@ -9,7 +9,7 @@ TARGET = main
 TARGET_DEL = main.exe
 
 # source files
-SRCS = classes/appliance.cpp classes/household.cpp classes/scheduler.cpp classes/task.cpp classes/water_system.cpp
+SRCS = main.cpp classes/appliance.cpp classes/household.cpp classes/scheduler.cpp classes/task.cpp classes/water_system.cpp
 
 # object files
 OBJS = $(SRCS:.cpp=.o)
@@ -27,10 +27,10 @@ $(TARGET): $(OBJS)
 
 # rule to run the executable
 run: $(TARGET)
-	$(TARGET)
+	./$(TARGET)
 
 # clean rule to remove generated files
 clean:
-	del $(TARGET_DEL) $(OBJS)
+	rm -f $(TARGET) $(OBJS)
 
 # clang++ main.cpp -std=c++17 -I/opt/homebrew/include

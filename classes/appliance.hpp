@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string>
 #include <vector>
 
@@ -14,6 +16,8 @@ class Appliance {
 
         Appliance(const Appliance& other);
 
+        virtual ~Appliance() = default;
+
         // Setters
         void setName(const std::string& name);
         void setCycleTime(int minutes);
@@ -22,6 +26,7 @@ class Appliance {
         void setInterruptable(bool interruptable);
         void setTakesGreywater(bool takes_greywater);
         void setProducesGreywater(bool produces_greywater);
+        void setGreywaterOutputPerCycle(bool greywater_output_per_cycle);
 
         // Getters
         std::string name() const;
@@ -31,6 +36,12 @@ class Appliance {
         bool interruptable() const;
         bool takesGreywater() const;
         bool producesGreywater() const;
+
+        // default: produces no greywater
+        virtual double waterOutputPerCycle() const {
+            return 0.0;
+        }
+        
 
     protected:
         std::string name_;
@@ -48,9 +59,10 @@ class GreywaterAppliance: public Appliance {
         GreywaterAppliance(
             const std::string& name,
             int cycle_time,
-            const std::vector<double>& water_usage_per_minute,
+            double water_usage_per_minute,
             double total_water_usage,
             bool interruptable,
+            bool takes_greywater,
             double water_output_per_cycle
         );
 
@@ -58,7 +70,7 @@ class GreywaterAppliance: public Appliance {
         void setWaterOutputPerCycle(double water_output_per_cycle);
 
         // Getters
-        double waterOutputPerCycle() const;  
+        double waterOutputPerCycle() const override;  
 
     private:
         double water_output_per_cycle_; // liters

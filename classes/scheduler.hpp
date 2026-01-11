@@ -1,3 +1,5 @@
+#pragma once
+
 #include <vector>
 #include <memory>
 #include <queue>
@@ -10,7 +12,6 @@
 class Scheduler {
     public:
         Scheduler(
-            std::vector<std::unique_ptr<Task>> predefined_tasks,
             WaterSystem& water_system,
             double time_step
         );
@@ -50,6 +51,8 @@ class Scheduler {
 
         int finished_tasks_;
         int unfinished_tasks_;
+        double water_used_;
+        double greywater_used_;
 
         // THREADING
         std::thread scheduler_thread_;

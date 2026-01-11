@@ -1,3 +1,5 @@
+#pragma once
+
 class WaterSystem {
     public:
         WaterSystem(

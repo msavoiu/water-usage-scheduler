@@ -54,6 +54,7 @@ GreywaterAppliance::GreywaterAppliance(
     double water_usage_per_minute,
     double total_water_usage,
     bool interruptable,
+    bool takes_greywater,
     double water_output_per_cycle
 )
     : Appliance(
@@ -62,7 +63,7 @@ GreywaterAppliance::GreywaterAppliance(
         water_usage_per_minute,
         total_water_usage,
         interruptable,
-        false
+        takes_greywater
     ),
     water_output_per_cycle_(water_output_per_cycle)
 {
