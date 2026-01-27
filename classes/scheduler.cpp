@@ -25,9 +25,6 @@ Scheduler::Scheduler(
 {
     // parse JSON and load in predetermined tasks
     unfinished_tasks_ = all_tasks_.size();
-
-    scheduler_thread_ = std::thread(&Scheduler::schedulerThread, this); // this refers to the object the function runs on
-    runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);
 }
 
 Scheduler::~Scheduler() {
@@ -40,7 +37,7 @@ Scheduler::~Scheduler() {
 
 void Scheduler::start() {
     scheduler_thread_ = std::thread(&Scheduler::schedulerThread, this);
-    runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);    
+    runner_thread_ = std::thread(&Scheduler::taskRunnerThread, this);
 }
 
 void Scheduler::wait() {

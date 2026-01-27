@@ -16,7 +16,8 @@ int main() {
         60.0 // time_step
     );
 
-    scheduler.start(); // starts threads
+    scheduler.start();
+
     scheduler.wait(); // joins threads
 
     std::cout << "Scheduling complete\n";
