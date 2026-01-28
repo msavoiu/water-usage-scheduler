@@ -2,14 +2,15 @@
 
 #include <vector>
 #include <memory>
+#include <unordered_map>
 
 #include "task.hpp"
 
 class Household {
     public:
-        Household(const std::string& config_file);
-        const std::vector<std::unique_ptr<Appliance>>& getAppliances() const;
+        Household(const std::string& config_file); // creates appliance configurations for the household, to be used in defining tasks
+        const std::unordered_map<std::string, std::unique_ptr<Appliance>>& getAppliances() const;
 
     private:
-        std::vector<std::unique_ptr<Appliance>> appliances_;
+        std::unordered_map<std::string, std::unique_ptr<Appliance>> appliances_;
 };

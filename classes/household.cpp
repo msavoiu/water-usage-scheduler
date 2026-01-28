@@ -15,7 +15,7 @@ Household::Household(const std::string& config_file) {
 
     for (const auto& item : data) {
         if (item["type"] == "Greywater") {
-            appliances_.emplace_back(
+            appliances_.[item["name"]] =
                 std::make_unique<GreywaterAppliance>(
                     item["name"],
                     item["cycle_time"],
@@ -24,11 +24,10 @@ Household::Household(const std::string& config_file) {
                     item["interruptable"],
                     item["takes_greywater"],
                     item["water_output_per_cycle"]
-                )
-            );
+                );
 
         } else {
-            appliances_.emplace_back(
+            appliances_[item["name"]] =
                 std::make_unique<Appliance>(
                     item["name"],
                     item["cycle_time"],
@@ -36,8 +35,7 @@ Household::Household(const std::string& config_file) {
                     item["total_water_usage"],
                     item["interruptable"],
                     item["takes_greywater"]
-                )
-            );
+                );
         }
     }
 }
