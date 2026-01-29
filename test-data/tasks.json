@@ -1,66 +1,38 @@
 [
   {
     "appliance": "Dishwasher",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 3,
-    "arrival_time": 25200,
-    "can_preempt": true,
-    "preemptions": 0
+    "arrival_time": 25200
   },
   {
     "appliance": "Washing Machine",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 4,
-    "arrival_time": 28800,
-    "can_preempt": false,
-    "preemptions": 0
+    "arrival_time": 28800
   },
   {
     "appliance": "Backyard Irrigation",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 2,
-    "arrival_time": 32400,
-    "can_preempt": true,
-    "preemptions": 0
+    "arrival_time": 32400
   },
   {
     "appliance": "Toilet",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 5,
-    "arrival_time": 43200,
-    "can_preempt": true,
-    "preemptions": 0
+    "arrival_time": 43200
   },
   {
     "appliance": "Dishwasher",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 2,
-    "arrival_time": 64800,
-    "can_preempt": true,
-    "preemptions": 0
+    "arrival_time": 64800
   },
   {
     "appliance": "Backyard Irrigation",
-    "status": "Pending",
+    "status": "NEW",
     "priority": 1,
-    "arrival_time": 75600,
-    "can_preempt": true,
-    "preemptions": 0
+    "arrival_time": 75600
   }
 ]
-
-// {
-//     "name": "",
-//     "appliance": "", // appliance name, must exactly match the existing appliances defined in the json
-//     "status": "",
-//     "priority": 0,
-//     // time remaining deduced from appliance type
-//     "arrival_time": 0, // seconds from midnight
-//     "can_preempt": true,
-//     "preemptions": 0
-//     // id assigned by constructor
-// }
-
-// all tasks should start with:
-// - preemptions = 0
-// - priority, arrival_time, and can_preempt can vary
