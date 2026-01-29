@@ -4,19 +4,20 @@
 
 #include "appliance.hpp"
 
-enum TaskStatus {
-    NEW,
-    RUNNING,
-    WAITING,
-    READY,
-    TERMINATED
-};
+// enum TaskStatus {
+//     NEW,
+//     RUNNING,
+//     WAITING,
+//     READY,
+//     TERMINATED
+// };
 
 class Task {
     public:
         Task(
             Appliance& appliance,
-            TaskStatus status_,
+            std::string status,
+            double arrival_time,
             int base_priority
         );
 
@@ -25,7 +26,8 @@ class Task {
 
         // Getters
         Appliance& appliance() const;
-        TaskStatus status() const;
+        std::string status() const;
+        // TaskStatus status() const;
         int basePriority() const;
         int priority() const;
         double timeRemaining() const;
@@ -36,7 +38,7 @@ class Task {
 
         // Setters
         void setAppliance(Appliance& appliance);
-        void setStatus(TaskStatus status);
+        void setStatus(std::string& status);
         void setBasePriority(int base_priority);
         void setPriority(int priority);
         void setTimeRemaining(double time_remaining);
@@ -50,7 +52,7 @@ class Task {
     private:
         Appliance& appliance_;
 
-        TaskStatus status_;
+        std::string status_;
         int base_priority_;
         int priority_;
         double arrival_time_; // minutes since midnight
@@ -67,9 +69,9 @@ struct TaskCompare {
     bool operator()(const Task* a, const Task* b) const;
 };
 
-int statusRank(TaskStatus s);
-bool isActive(TaskStatus s);
-std::string statusToString(TaskStatus s);
+int statusRank(std::string s);
+bool isActive(std::string s);
+// std::string statusToString(TaskStatus s);
 std::string formatTime(double minutes);
 
 bool taskPrintCompare(const Task* a, const Task* b);

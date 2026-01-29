@@ -4,13 +4,19 @@
 #include <iomanip>
 #include <algorithm>
 #include <sstream>
+#include <fstream>
+#include <nlohmann/json.hpp>
 
 #include "scheduler.hpp"
-#include "string"
+// #include "household.hpp"
+// #include "task.hpp"
+// #include "string"
 
 Scheduler::Scheduler(
+    Household& household,
     WaterSystem& water_system,
-    double time_step
+    double time_step,
+    const std::string& config_file
 )
     : water_system_(water_system),
       running_task_(false),
@@ -24,6 +30,35 @@ Scheduler::Scheduler(
       time_step_(time_step)
 {
     // parse JSON and load in predetermined tasks
+    std::ifstream file(config_file);
+
+    if (!file.is_open()) {
+        throw std::runtime_error("Failed to open config file: " + config_file);
+    }
+
+    nlohmann::json data;
+    file >> data;
+
+        for (const auto& item : data) {
+            std::string appliance_name = item["appliance"];
+
+            if (!household.appliances().contains(appliance_name)) {
+                std::cout << "Ignoring task. No appliance found.\n";
+                continue;
+            }
+
+            auto& appliance = *household.appliances().at(appliance_name);
+
+            all_tasks_.emplace_back(
+                std::make_unique<Task>(
+                    appliance,
+                    item["status"].get<std::string>(),
+                    item["arrival_time"].get<double>(),
+                    item["priority"].get<double>()
+                )
+            );
+        }
+
     unfinished_tasks_ = all_tasks_.size();
 }
 
@@ -125,7 +160,7 @@ void Scheduler::runCurrentTask() {
 
     // deplete greywater store if the appliance can use it
     if (current_task_->appliance().takesGreywater() &&
-        water_system_.currentGreywaterStore() >= current_task_->appliance().totalWaterUsage())
+        water_system_.currentGreywaterStore() >= (current_task_->appliance().waterUsagePerMinute()))
     {
         water_system_.updateCurrentGreywaterStore(-(current_task_->appliance().waterUsagePerMinute()));
         greywater_used_ += current_task_->appliance().waterUsagePerMinute();
@@ -158,7 +193,7 @@ bool Scheduler::tryPreempt() {
 
         if (current_task_->canPreempt() &&
             task_queue_.top()->priority() > current_task_->priority() &&
-            task_queue_.top()->status() == READY)
+            task_queue_.top()->status() == "READY")
         {
             updatePriority(current_task_);
             task_queue_.push(current_task_);
@@ -186,7 +221,7 @@ void Scheduler::updatePriority(Task* task) {
 
     // GREYWATER CONSIDERATIONS
     if (task->appliance().takesGreywater() &&
-        water_system_.currentGreywaterStore() < task->appliance().totalWaterUsage()) {
+        water_system_.currentGreywaterStore() < task->appliance().waterUsagePerMinute()) {
         // decrease priority
     } else if (task->appliance().takesGreywater()) {
         // increase priority (since greywater is available to use right now
@@ -243,7 +278,7 @@ void Scheduler::printState() {
         std::cout << std::left
                   << std::setw(8)  << t->id() << "| "
                   << std::setw(20) << t->appliance().name() << "| "
-                  << std::setw(13) << statusToString(t->status()) << "| "
+                  << std::setw(13) << t->status() << "| "
                   << std::setw(12) << t->priority() << "| "
                   << formatTime(t->timeRemaining())
                   << '\n';
@@ -262,7 +297,7 @@ void Scheduler::printState() {
         std::cout << std::left
                   << std::setw(8)  << t->id() << "| "
                   << std::setw(20) << t->appliance().name() << "| "
-                  << std::setw(13) << statusToString(t->status()) << "| "
+                  << std::setw(13) << t->status() << "| "
                   << std::setw(12) << t->priority() << "| "
                   << formatTime(t->timeRemaining())
                   << '\n';

@@ -14,30 +14,34 @@ Household::Household(const std::string& config_file) {
     file >> data;
 
     for (const auto& item : data) {
+        const std::string name = item["name"];
+
         if (item["type"] == "Greywater") {
-            appliances_.[item["name"]] =
+            appliances_.emplace(
+                name,
                 std::make_unique<GreywaterAppliance>(
-                    item["name"],
-                    item["cycle_time"],
-                    item["water_usage_per_minute"],
-                    item["total_water_usage"],
-                    item["interruptable"],
-                    item["takes_greywater"],
-                    item["water_output_per_cycle"]
-                );
+                    item["name"].get<std::string>(),
+                    item["cycle_time"].get<double>(),
+                    item["water_usage_per_minute"].get<double>(),
+                    item["interruptable"].get<bool>(),
+                    item["takes_greywater"].get<bool>(),
+                    item["water_output_per_cycle"].get<double>()
+                )
+            );
 
         } else {
-            appliances_[item["name"]] =
+            appliances_.emplace(
+                name,
                 std::make_unique<Appliance>(
-                    item["name"],
-                    item["cycle_time"],
-                    item["water_usage_per_minute"],
-                    item["total_water_usage"],
-                    item["interruptable"],
-                    item["takes_greywater"]
-                );
+                    item["name"].get<std::string>(),
+                    item["cycle_time"].get<double>(),
+                    item["water_usage_per_minute"].get<double>(),
+                    item["interruptable"].get<bool>(),
+                    item["takes_greywater"].get<bool>()
+                )
+            );
         }
     }
 }
 
-const std::vector<std::unique_ptr<Appliance>>& Household::getAppliances() const { return appliances_; }
+const std::unordered_map<std::string, std::unique_ptr<Appliance>>& Household::appliances() const { return appliances_; }

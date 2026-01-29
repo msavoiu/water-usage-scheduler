@@ -5,31 +5,33 @@
 
 Task::Task(
     Appliance& appliance,
-    TaskStatus status,
+    std::string status,
+    double arrival_time,
     int base_priority
 )
     : appliance_(appliance),
       status_(status),
       base_priority_(base_priority),
       time_remaining_(appliance.cycleTime()),
+      arrival_time_(arrival_time),
       can_preempt_(appliance.interruptable()),
       id_(next_id_.fetch_add(1))
 {}
 
 bool Task::finished() {
-    return (status_ == TERMINATED);
+    return (status_ == "TERMINATED");
 }
 
 void Task::runFor(int seconds) {
     if (time_remaining_ > 0.0) {
         time_remaining_ -= seconds;
     } else {
-        status_ = TERMINATED;
+        status_ = "TERMINATED";
     }
 }
 
 Appliance& Task::appliance() const { return appliance_; }
-TaskStatus Task::status() const { return status_; }
+std::string Task::status() const { return status_; }
 int Task::basePriority() const { return base_priority_; }
 int Task::priority() const { return priority_; }
 double Task::arrivalTime() const { return arrival_time_; }
@@ -39,7 +41,7 @@ int Task::preemptions() const { return preemptions_; }
 int Task::id() const { return id_; }
 
 void Task::setAppliance(Appliance& appliance) { appliance_ = appliance; }
-void Task::setStatus(TaskStatus status) { status_ = status; }
+void Task::setStatus(std::string& status) { status_ = status; }
 void Task::setBasePriority(int base_priority) { base_priority_ = base_priority; }
 void Task::setPriority(int priority) { priority_ = priority; }
 void Task::setTimeRemaining(double time_remaining) { time_remaining_ = time_remaining; }
@@ -65,31 +67,36 @@ bool TaskCompare::operator()(const Task* a, const Task* b) const {
     return a->priority() < b->priority();
 }
 
-int statusRank(TaskStatus s) {
-    switch (s) {
-        case TaskStatus::RUNNING:    return 0;
-        case TaskStatus::WAITING:    return 1;
-        case TaskStatus::READY:      return 2;
-        case TaskStatus::NEW:        return 3;
-        case TaskStatus::TERMINATED: return 4;
+int statusRank(std::string s) {
+    if (s == "RUNNING") {
+        return 0; 
+    } else if (s == "WAITING") {
+        return 1;
+    } else if (s == "READY") {
+        return 2;
+    } else if (s == "NEW") {
+        return 3;
+    } else if (s == "TERMINATED") {
+        return 4;
     }
+
     return 5; // fallback
 }
 
-bool isActive(TaskStatus s) {
-    return s == TaskStatus::RUNNING || s == TaskStatus::READY;
+bool isActive(std::string s) {
+    return (s == "RUNNING" || s == "READY" || s == "WAITING");
 }
 
-std::string statusToString(TaskStatus s) {
-    switch (s) {
-        case TaskStatus::RUNNING:    return "RUNNING";
-        case TaskStatus::WAITING:    return "WAITING";
-        case TaskStatus::READY:      return "READY";
-        case TaskStatus::NEW:        return "NEW";
-        case TaskStatus::TERMINATED: return "TERMINATED";
-    }
-    return "UNKNOWN";
-}
+// std::string statusToString(TaskStatus s) {
+//     switch (s) {
+//         case TaskStatus::RUNNING:    return "RUNNING";
+//         case TaskStatus::WAITING:    return "WAITING";
+//         case TaskStatus::READY:      return "READY";
+//         case TaskStatus::NEW:        return "NEW";
+//         case TaskStatus::TERMINATED: return "TERMINATED";
+//     }
+//     return "UNKNOWN";
+// }
 
 std::string formatTime(double minutes) {
     int total = static_cast<int>(minutes);

@@ -6,14 +6,17 @@
 #include <mutex>
 #include <thread>
 
+#include "household.hpp"
 #include "task.hpp"
 #include "water_system.hpp"
 
 class Scheduler {
     public:
         Scheduler(
+            Household& household,
             WaterSystem& water_system,
-            double time_step
+            double time_step,
+            const std::string& config_file
         );
 
         ~Scheduler();

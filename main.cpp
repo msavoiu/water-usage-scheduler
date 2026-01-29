@@ -10,10 +10,13 @@
 
 int main() {
     WaterSystem water_system(10.0, 5.0, 0.0);
+    Household household("test-data/appliances.json");
 
     Scheduler scheduler(
+        household,
         water_system,
-        60.0 // time_step
+        60.0, // time_step,
+        "test-data/tasks.json"
     );
 
     scheduler.start();
