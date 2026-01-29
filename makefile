@@ -2,7 +2,7 @@
 CXX = clang++
 
 # compiler flags
-CXXFLAGS = -std=c++17 -I/opt/homebrew/include
+CXXFLAGS = -std=c++20 -I/opt/homebrew/include
 
 # target executable
 TARGET = main
